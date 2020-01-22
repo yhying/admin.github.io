@@ -8,6 +8,15 @@ import './assets/css/global.css'
 import './assets/fonts/iconfont.css'
 // 引入rem布局
 // import './assets/js/rem.js'
+import axios from 'axios'
+axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
+Vue.prototype.$http=axios;
+// 设置请求拦截器
+axios.interceptors.request.use(config=>{
+  config.headers.Authorization =sessionStorage.getItem('token')
+  // console.log(config);
+  return config
+})
 Vue.config.productionTip = false
 new Vue({
   router,
