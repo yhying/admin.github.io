@@ -19,11 +19,115 @@
                     <el-button type="primary">添加用户</el-button>
                 </el-col>
             </el-row>
+            <el-table :data="userList" style="width: 100%" border stripe>
+                <el-table-column type="index" label="#">
+                </el-table-column>
+                <el-table-column prop="username" label="姓名">
+                </el-table-column>
+                <el-table-column prop="email" label="邮箱">
+                </el-table-column>
+                <el-table-column prop="mobile" label="电话">
+                </el-table-column>
+                <el-table-column prop="role_name" label="角色">
+                </el-table-column>
+                <el-table-column prop="mg_state" label="状态">
+                    <template slot-scope="scope">
+                        <el-switch v-model="scope.row.mg_state" @change="changeState(scope.row)"></el-switch>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="mobile" label="操作" width="180px">
+                    <template slot-scope="scope">
+                        <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
+                        <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+                        <el-tooltip class="item" effect="dark" content="设置角色" placement="top" :enterable="false">
+                            <el-button type="warning" icon="el-icon-s-tools" size="mini"></el-button>
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <!-- 分页区间 -->
+            <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                :current-page="queryInfo.pagenum" :page-sizes="[1, 2, 5,10]" :page-size="queryInfo.pagesize"
+                layout="total, sizes, prev, pager, next, jumper" :total="total">
+            </el-pagination>
         </el-card>
     </div>
 </template>
 <script>
     export default {
+        data() {
+            return {
+                queryInfo: {
+                    query: '',
+                    // 当前的页数
+                    pagenum: 1,
+                    // 当前每页显示多少条数据
+                    pagesize: 2
+                },
+                userList: [],
+                total: ''
+
+            }
+        },
+        created() {
+            this.getuserList();
+        },
+        methods: {
+            // 解决promise
+            // async getuserList() {
+            //     const {
+            //         data: res
+            //     } = await this.$http.get('users', {
+            //         params: this.queryInfo
+            //     })
+            //     if (res.meta.status !== 200) {
+            //         return this.$message.error('获取用户列表失败！')
+            //     }
+            //     this.userList = res.data.users
+            //     this.total = res.data.total
+            //     console.log(res)
+            // },
+            getuserList() {
+                this.$http.get('users', {
+                    params: this.queryInfo
+                }).then(res => {
+                    // console.log(res);
+                    if (res.data.meta.status !== 200) {
+                        return this.$message.error('获取用户列表失败！')
+                    }
+                    this.userList = res.data.data.users
+                    this.total = res.data.data.total
+                    console.log(this.userList);
+                })
+            },
+            // 监听pagesize值改变
+            handleSizeChange(newSize) {
+                this.queryInfo.pagesize = newSize;
+                this.getuserList();
+
+            },
+            // 监听页码值改变
+            handleCurrentChange(currentSize) {
+                this.queryInfo.pagenum = currentSize
+                this.getuserList();
+            },
+            // 向后台保存状态
+            changeState(e) {
+                console.log(e);
+                console.log(e.mg_state);
+                this.$http.put('users/' + e.id + '/state/' + e.mg_state).then(res => {
+                    // console.log(res);
+                    if (res.data.meta.status == 200) {
+                        this.$message({
+                            showClose: true,
+                            message: res.data.meta.msg,
+                            type: 'success',
+                            duration:1000
+                        });
+                    }
+                })
+            }
+        },
 
     }
 </script>
@@ -34,6 +138,15 @@
     }
 
     .el-card {
-        box-shadow: 0 1px 1px rgba(0,0,0,0.15) !important;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .el-table {
+        margin-top: 15px;
+        font-size: 12px;
+    }
+
+    .el-pagination {
+        margin-top: 10px;
     }
 </style>

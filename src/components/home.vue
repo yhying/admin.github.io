@@ -69,7 +69,7 @@
                     // console.log(res);
                     if (res.data.meta.status == 200) {
                         this.asideList = res.data.data
-                        console.log(this.asideList);
+                        // console.log(this.asideList);
                     } else {
                         this.$message.error(res.data.meta.msg)
                     }
@@ -79,7 +79,7 @@
                 this.isCollapse = !this.isCollapse;
             },
             keepActive(path) {
-                console.log(path);
+                // console.log(path);
                 window.sessionStorage.setItem('active',path)
                 this.activePath=path
             }
