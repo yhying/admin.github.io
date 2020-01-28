@@ -40,9 +40,12 @@
                     <template slot-scope="scope">
                         <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDailog(scope.row)">
                         </el-button>
-                        <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(scope.row.id)"></el-button>
+                        <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(scope.row.id)">
+                        </el-button>
                         <el-tooltip class="item" effect="dark" content="设置角色" placement="top" :enterable="false">
-                            <el-button type="warning" icon="el-icon-s-tools" size="mini"></el-button>
+                            <el-button type="warning" icon="el-icon-s-tools" size="mini"
+                                @click="chooseRoles(scope.row)">
+                            </el-button>
                         </el-tooltip>
                     </template>
                 </el-table-column>
@@ -93,6 +96,21 @@
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editDialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="editUser()">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!-- 分配权限 -->
+        <el-dialog title="分配角色" :visible.sync="chooseDialogVisible" width="50%">
+            <p>当前用户:{{userInfo.username}}</p>
+            <p>当前角色:{{userInfo.role_name}}</p>
+            <p>分配新角色
+                <el-select v-model="selectValue" clearable placeholder="请选择">
+                    <el-option v-for="item in roleList" :key="item.id" :label="item.roleName" :value="item.id">
+                    </el-option>
+                </el-select>
+            </p>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="chooseDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="chooseUser()">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -187,10 +205,14 @@
                     ]
 
                 },
+                userInfo: {},
                 userList: [],
+                roleList: [],
                 total: '',
+                selectValue: '',
                 dialogVisible: false,
                 editDialogVisible: false,
+                chooseDialogVisible: false,
 
             }
         },
@@ -273,7 +295,7 @@
                     // console.log(valid);
                     if (!valid) return
                     this.$http.post('users', this.addForm).then(res => {
-                        console.log(res);
+                        // console.log(res);
                         if (res.status == 200) {
                             this.$message.success('添加用户成功')
                             this.dialogVisible = false;
@@ -321,7 +343,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$http.delete('users/'+uid).then(res => {
+                    this.$http.delete('users/' + uid).then(res => {
                         // console.log(res);
                         if (res.status == 200) {
                             this.$message.success('删除用户成功')
@@ -336,6 +358,54 @@
                         message: '已取消删除'
                     });
                 });
+            },
+            chooseRoles(e) {
+                console.log(e);
+                this.userInfo = {
+                    username: e.username,
+                    role_name: e.role_name,
+                    uid: e.id
+                }
+                this.$http.get('roles').then(res => {
+                    // console.log(res);
+                    if (res.data.meta.status == 200) {
+                        this.roleList = res.data.data
+                        console.log(this.roleList);
+                    }
+                })
+                this.chooseDialogVisible = true;
+            },
+            chooseUser() {
+                // console.log(this.selectValue);
+                if (!this.selectValue) {
+                    // console.log(111);
+                    this.$message.error({
+                        type: 'error',
+                        message: '请选择要分配的角色',
+                        duration: 1000
+                    })
+                } else {
+                    this.$http.put('users/' + this.userInfo.uid + '/role', {
+                        rid: this.selectValue
+                    }).then(res => {
+                        console.log(res);
+                        if (res.data.meta.status == 200) {
+                            this.getuserList()
+                            this.$message.success({
+                                type: 'success',
+                                message: '更新角色成功',
+                                duration: 1000
+                            })
+                            this.chooseDialogVisible = false;
+                        } else {
+                            this.$message.error({
+                                type: 'error',
+                                message: '更新角色失败',
+                                duration: 1000
+                            })
+                        }
+                    })
+                }
             }
         }
 
