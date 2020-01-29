@@ -50,15 +50,4 @@
     }
 </script>
 <style lang="less" scoped>
-    .el-table {
-        max-height: 60%;
-    }
-    .el-breadcrumb {
-        margin-bottom: 15px;
-        font-size: 12px;
-    }
-
-    .el-card {
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15) !important;
-    }
 </style>

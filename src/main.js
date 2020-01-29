@@ -8,6 +8,8 @@ import './assets/css/global.css'
 import './assets/fonts/iconfont.css'
 // 引入rem布局
 // import './assets/js/rem.js'
+// 引入table grid
+import TreeTable from 'vue-table-with-tree-grid'
 import axios from 'axios'
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
 Vue.prototype.$http=axios;
@@ -18,6 +20,7 @@ axios.interceptors.request.use(config=>{
   return config
 })
 Vue.config.productionTip = false
+Vue.component('tree-table',TreeTable)
 new Vue({
   router,
   render: h => h(App)

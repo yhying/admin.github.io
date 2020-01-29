@@ -99,7 +99,7 @@
             </span>
         </el-dialog>
         <!-- 分配权限 -->
-        <el-dialog title="分配角色" :visible.sync="chooseDialogVisible" width="50%">
+        <el-dialog title="分配角色" :visible.sync="chooseDialogVisible" width="50%" @close="clearRoles()">
             <p>当前用户:{{userInfo.username}}</p>
             <p>当前角色:{{userInfo.role_name}}</p>
             <p>分配新角色
@@ -360,7 +360,7 @@
                 });
             },
             chooseRoles(e) {
-                console.log(e);
+                // console.log(e);
                 this.userInfo = {
                     username: e.username,
                     role_name: e.role_name,
@@ -370,7 +370,7 @@
                     // console.log(res);
                     if (res.data.meta.status == 200) {
                         this.roleList = res.data.data
-                        console.log(this.roleList);
+                        // console.log(this.roleList);
                     }
                 })
                 this.chooseDialogVisible = true;
@@ -388,7 +388,7 @@
                     this.$http.put('users/' + this.userInfo.uid + '/role', {
                         rid: this.selectValue
                     }).then(res => {
-                        console.log(res);
+                        // console.log(res);
                         if (res.data.meta.status == 200) {
                             this.getuserList()
                             this.$message.success({
@@ -406,27 +406,13 @@
                         }
                     })
                 }
+            },
+            clearRoles(){
+                this.selectValue=' '
             }
         }
 
     }
 </script>
 <style lang="less" scoped>
-    .el-breadcrumb {
-        margin-bottom: 15px;
-        font-size: 12px;
-    }
-
-    .el-card {
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15) !important;
-    }
-
-    .el-table {
-        margin-top: 15px;
-        font-size: 12px;
-    }
-
-    .el-pagination {
-        margin-top: 10px;
-    }
 </style>

@@ -42,13 +42,13 @@
                 </el-table-column>
                 <el-table-column label="角色操作">
                     <template slot-scope="scope">
-                        <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDailog(scope.row)">
+                        <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDailog(scope.row)">编辑
                         </el-button>
-                        <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(scope.row.id)">
+                        <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(scope.row.id)">删除
                         </el-button>
-                        <el-tooltip class="item" effect="dark" content="设置角色" placement="top" :enterable="false">
+                        <el-tooltip class="item" effect="dark" content="设置权限" placement="top" :enterable="false">
                             <el-button type="warning" icon="el-icon-s-tools" size="mini"
-                                @click="choosePower(scope.row)"></el-button>
+                                @click="choosePower(scope.row)">设置</el-button>
                         </el-tooltip>
                     </template>
                 </el-table-column>
@@ -187,20 +187,6 @@
     }
 </script>
 <style lang="less" scoped>
-    .el-table {
-        /* max-height: 60%; */
-        margin-top: 15px;
-    }
-
-    .el-breadcrumb {
-        margin-bottom: 15px;
-        font-size: 12px;
-    }
-
-    .el-card {
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15) !important;
-    }
-
     .bdtop {
         border-top: 1px solid #eee;
     }
