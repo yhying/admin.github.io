@@ -6,3 +6,16 @@ html,body,#app {
     /* max-height:800px; */
     min-width: 1200px;
 }
+.el-scrollbar__wrap {
+    /* height: 300px !important; */
+    /* overflow-y: hidden !important; */
+    /* overflow: scroll */
+}
+.el-cascader-menu__wrap{ 
+    height: 300px !important;
+}
+/* */
+.zk-table {
+    overflow-y: scroll !important;
+    max-height: 450px;
+}

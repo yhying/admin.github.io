@@ -71,7 +71,7 @@
             },
             Tologin() {
                 this.$refs.loginFormRef.validate(async valid => {
-                    console.log(valid);
+                    // console.log(valid);
                     if (!valid)
                         return;
                     this.$http.post('login', this.loginFrom).then(res => {
