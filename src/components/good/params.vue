@@ -21,6 +21,9 @@
                     </el-button>
                     <el-table :data="manyTableData" border stripe max-height="330px">
                         <el-table-column type="expand">
+                            <template slot-scope="scope">
+                                <el-tag v-for="(item,i) in scope.row.attr_vals" closable>{{item}}</el-tag>
+                            </template>
                         </el-table-column>
                         <el-table-column type="index" label="#">
                         </el-table-column>
@@ -32,7 +35,7 @@
                                     @click="showEditDailog(scope.row)">编辑
                                 </el-button>
                                 <el-button type="danger" icon="el-icon-delete" size="mini"
-                                    @click="deleteUser(scope.row.id)">删除
+                                    @click="deletePrams(scope.row)">删除
                                 </el-button>
                             </template>
                         </el-table-column>
@@ -54,7 +57,7 @@
                                     @click="showEditDailog(scope.row)">编辑
                                 </el-button>
                                 <el-button type="danger" icon="el-icon-delete" size="mini"
-                                    @click="deleteUser(scope.row.id)">删除
+                                    @click="deletePrams(scope.row)">删除
                                 </el-button>
                             </template>
                         </el-table-column>
@@ -74,6 +77,18 @@
                 <el-button type="primary" @click="addPrams()">确 定</el-button>
             </span>
         </el-dialog>
+        <!-- 编辑属性对话框 -->
+        <el-dialog :title="'修改'+isText" :visible.sync="EditdialogVisible" width="50%" @close="editDialogClosed()">
+            <el-form :model="EditForm" :rules="addrules" ref="EditruleForm" label-width="100px">
+                <el-form-item :label="isText" prop="attr_name">
+                    <el-input v-model="EditForm.attr_name"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="EditdialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="EditPrams()">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -83,9 +98,11 @@
                 parentscatesList: [],
                 selectKeys: [],
                 dialogVisible: false,
+                EditdialogVisible: false,
                 addForm: {
                     attr_name: ''
                 },
+                EditForm: {},
                 addrules: {
                     attr_name: [{
                         required: true,
@@ -162,31 +179,103 @@
             closeDialog() {
                 this.$refs.addruleForm.resetFields();
             },
-            // 添加属性方法
-            addPrams(){
-                this.$refs.addruleForm.validate(valid=>{
-                    if(!valid) return
-                    this.$http.post('categories/' + this.selectKeys[this.selectKeys.length - 1] + '/attributes', {
-                        attr_sel: this.activeName,
-                        attr_name: this.addForm.attr_name,
-                }).then(res => {
-                    console.log(res);
-                    if (res.data.meta.status == 201) {
+            editDialogClosed() {
+                this.$refs.EditruleForm.resetFields()
+            },
+            // 编辑对话框
+            showEditDailog(e) {
+                console.log(e);
+                this.EditForm = e
+                this.EditdialogVisible = true;
+            },
+            // 确定修改参数
+            EditPrams() {
+                this.$refs.EditruleForm.validate(valid => {
+                    if (!valid) return;
+                    this.$http.put('categories/' + this.selectKeys[this.selectKeys.length - 1] +
+                        '/attributes/' + this.EditForm.attr_id, {
+                            attr_name: this.EditForm.attr_name,
+                            attr_sel: this.activeName
+                        }).then(res => {
+                        // console.log(res);
+                        if (res.data.meta.status !== 200) {
+                            return this.$message({
+                                type: 'error',
+                                message: '修改参数失败',
+                                duration: 1000
+                            });
+                        }
                         this.$message({
                             type: 'success',
-                            message: '添加成功',
+                            message: '修改参数成功',
                             duration: 1000
                         });
-                        this.dialogVisible=false;
                         this.getgoodprams();
-                    } else {
-                        this.$message({
-                            type: 'error',
-                            message: '添加失败',
-                            duration: 1000
-                        });
-                    }
+                        this.EditdialogVisible = false;
+                    })
                 })
+            },
+            // 删除参数
+            deletePrams(e) {
+                this.EditForm=e
+                this.$confirm('此操作将永久删除该参数, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    console.log(this.EditForm.attr_id);
+                    this.$http.delete('categories/' + this.selectKeys[this.selectKeys.length - 1] +
+                        '/attributes/' + this.EditForm.attr_id).then(res => {
+                        // console.log(res);
+                        if (res.data.meta.status == 200) {
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功',
+                                duration: 1000
+                            });
+                            this.getgoodprams();
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: '删除失败',
+                                duration: 1000
+                            });
+                        }
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除',
+                        duration: 1000
+                    });
+                });
+            },
+            // 添加属性方法
+            addPrams() {
+                this.$refs.addruleForm.validate(valid => {
+                    if (!valid) return
+                    this.$http.post('categories/' + this.selectKeys[this.selectKeys.length - 1] +
+                        '/attributes', {
+                            attr_sel: this.activeName,
+                            attr_name: this.addForm.attr_name,
+                        }).then(res => {
+                        // console.log(res);
+                        if (res.data.meta.status == 201) {
+                            this.$message({
+                                type: 'success',
+                                message: '添加成功',
+                                duration: 1000
+                            });
+                            this.dialogVisible = false;
+                            this.getgoodprams();
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: '添加失败',
+                                duration: 1000
+                            });
+                        }
+                    })
                 })
             },
             getgoodprams() {
@@ -195,8 +284,12 @@
                         sel: this.activeName
                     }
                 }).then(res => {
-                    // console.log(res);
-                    if (res.data.meta.status===200) {
+                    console.log(res);
+                    res.data.data.forEach((item,i)=>{
+                    item.attr_vals=item.attr_vals.split(',')
+                    // console.log(item.attr_vals);
+                    })
+                    if (res.data.meta.status === 200) {
                         if (this.activeName === 'many') {
                             this.manyTableData = res.data.data
                         } else {
@@ -228,5 +321,8 @@
 
     .el-cascader {
         width: 30%;
+    }
+    .el-tag {
+        margin: 10px;
     }
 </style>
