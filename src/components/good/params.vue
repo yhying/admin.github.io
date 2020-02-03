@@ -22,7 +22,15 @@
                     <el-table :data="manyTableData" border stripe max-height="330px">
                         <el-table-column type="expand">
                             <template slot-scope="scope">
-                                <el-tag v-for="(item,i) in scope.row.attr_vals" closable>{{item}}</el-tag>
+                                <el-tag v-for="(item,i) in scope.row.attr_vals" closable @close="handleClose(i,scope.row)">{{item}}</el-tag>
+                                <el-input class="input-new-tag" v-if="scope.row.inputVisible"
+                                    v-model="scope.row.inputValue" ref="saveTagInput" size="small"
+                                    @keyup.enter.native="handleInputConfirm(scope.row)"
+                                    @blur="handleInputConfirm(scope.row)">
+                                </el-input>
+                                <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+
+                                    New Tag
+                                </el-button>
                             </template>
                         </el-table-column>
                         <el-table-column type="index" label="#">
@@ -46,6 +54,17 @@
                     </el-button>
                     <el-table :data="onlyTableData" border stripe max-height="330px">
                         <el-table-column type="expand">
+                            <template slot-scope="scope">
+                                <el-tag v-for="(item,i) in scope.row.attr_vals" closable>{{item}}</el-tag>
+                                <el-input class="input-new-tag" v-if="scope.row.inputVisible"
+                                    v-model="scope.row.inputValue" ref="saveTagInput" size="small"
+                                    @keyup.enter.native="handleInputConfirm(scope.row)"
+                                    @blur="handleInputConfirm(scope.row)">
+                                </el-input>
+                                <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+
+                                    New Tag
+                                </el-button>
+                            </template>
                         </el-table-column>
                         <el-table-column type="index" label="#">
                         </el-table-column>
@@ -188,6 +207,53 @@
                 this.EditForm = e
                 this.EditdialogVisible = true;
             },
+            handleInputConfirm(e) {
+                console.log(e);
+                if (e.inputValue.trim().length === 0) {
+                    e.inputValue = ''
+                    e.inputVisible = false;
+                    return
+                }
+                this.SaveAttrvals(e)
+                e.attr_vals.push(e.inputValue.trim())
+                e.inputValue = ''
+                e.inputVisible = false;
+            },
+            SaveAttrvals(e){
+                this.$http.put('categories/' + this.selectKeys[this.selectKeys.length - 1] + '/attributes/' + e
+                .attr_id, {
+                    attr_name: e.attr_name,
+                    attr_sel: e.attr_sel,
+                    attr_vals: e.attr_vals.join(',')
+                }).then(res => {
+                    if (res.data.meta.status == 200) {
+                        this.$message({
+                            type: 'success',
+                            message: '更新成功',
+                            duration: 1000
+                        });
+                    } else {
+                        this.$message({
+                            type: 'error',
+                            message: '更新失败',
+                            duration: 1000
+                        });
+                    }
+                })
+            },
+            showInput(e) {
+                e.inputVisible = true;
+                // 让文本框自动获得焦点
+                // $nextTick 方法的作用，就是当页面上元素被重新渲染之后，才会指定回调函数中的代码
+                this.$nextTick(_ => {
+                    this.$refs.saveTagInput.$refs.input.focus()
+                })
+            },
+            // 删除tag参数标签
+            handleClose(i,e){
+                e.attr_vals.splice(i,1)
+                this.SaveAttrvals(e)
+            },
             // 确定修改参数
             EditPrams() {
                 this.$refs.EditruleForm.validate(valid => {
@@ -217,7 +283,7 @@
             },
             // 删除参数
             deletePrams(e) {
-                this.EditForm=e
+                this.EditForm = e
                 this.$confirm('此操作将永久删除该参数, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -284,10 +350,12 @@
                         sel: this.activeName
                     }
                 }).then(res => {
-                    console.log(res);
-                    res.data.data.forEach((item,i)=>{
-                    item.attr_vals=item.attr_vals.split(',')
-                    // console.log(item.attr_vals);
+                    // console.log(res);
+                    res.data.data.forEach((item, i) => {
+                        item.attr_vals = item.attr_vals ? item.attr_vals.split(',') : [];
+                        item.inputVisible = false;
+                        item.inputValue = ''
+                        // console.log(item.attr_vals);
                     })
                     if (res.data.meta.status === 200) {
                         if (this.activeName === 'many') {
@@ -322,7 +390,17 @@
     .el-cascader {
         width: 30%;
     }
+
     .el-tag {
         margin: 10px;
+    }
+
+    .button-new-tag {
+        margin-left: 10px;
+    }
+
+    .input-new-tag {
+        width: 90px;
+        margin-left: 10px;
     }
 </style>
