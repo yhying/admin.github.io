@@ -11,6 +11,7 @@ import params from '../components/good/params.vue'
 import categories from '../components/good/categories.vue'
 import orders from '../components/order/orders.vue'
 import reports from '../components/report/reports.vue'
+import add from '../components/good/add.vue'
 
 Vue.use(VueRouter)
 
@@ -28,40 +29,44 @@ const router = new VueRouter({
       component: Home,
       redirect: '/welcome',
       children: [{
-        path: '/welcome',
-        component: Welcome
-      }, {
-        path: '/users',
-        component: users
-      }, , {
-        path: '/roles',
-        component: roles
-      }, {
-        path: '/rights',
-        component: rights
-      },
-      {
-        path: '/goods',
-        component: goods
-      },
-      {
-        path: '/params',
-        component: params
-      },
-      {
-        path: '/categories',
-        component: categories
-      },
-      {
-        path: '/orders',
-        component: orders
-      },
-      {
-        path: '/reports',
-        component:reports
-      },
-      
-     ]
+          path: '/welcome',
+          component: Welcome
+        }, {
+          path: '/users',
+          component: users
+        }, , {
+          path: '/roles',
+          component: roles
+        }, {
+          path: '/rights',
+          component: rights
+        },
+        {
+          path: '/goods',
+          component: goods
+        },
+        {
+          path: '/goods/add',
+          component: add
+        },
+        {
+          path: '/params',
+          component: params
+        },
+        {
+          path: '/categories',
+          component: categories
+        },
+        {
+          path: '/orders',
+          component: orders
+        },
+        {
+          path: '/reports',
+          component: reports
+        },
+
+      ]
     }
   ]
 })

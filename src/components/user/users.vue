@@ -208,7 +208,7 @@
                 userInfo: {},
                 userList: [],
                 roleList: [],
-                total: '',
+                total:0,
                 selectValue: '',
                 dialogVisible: false,
                 editDialogVisible: false,

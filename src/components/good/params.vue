@@ -179,6 +179,8 @@
                 // console.log(this.selectKeys[this.selectKeys.length-1]);
                 if (this.selectKeys.length < 3) {
                     this.selectKeys = []
+                    this.manyTableData=[]
+                    this.onlyTableData=[]
                     return;
                 }
                 this.getgoodprams()
@@ -203,19 +205,19 @@
             },
             // 编辑对话框
             showEditDailog(e) {
-                console.log(e);
+                // console.log(e);
                 this.EditForm = e
                 this.EditdialogVisible = true;
             },
             handleInputConfirm(e) {
-                console.log(e);
+                // console.log(e);
                 if (e.inputValue.trim().length === 0) {
                     e.inputValue = ''
                     e.inputVisible = false;
                     return
                 }
-                this.SaveAttrvals(e)
                 e.attr_vals.push(e.inputValue.trim())
+                this.SaveAttrvals(e)
                 e.inputValue = ''
                 e.inputVisible = false;
             },
