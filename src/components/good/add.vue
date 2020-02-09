@@ -39,13 +39,32 @@
                             </el-cascader>
                         </el-form-item>
                     </el-tab-pane>
-                    <el-tab-pane label="商品参数" name="1">商品参数</el-tab-pane>
-                    <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
-                    <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
+                    <el-tab-pane label="商品参数" name="1">
+                        <el-form-item :label="item.attr_name" v-for="item in manyTableData">
+                            <el-checkbox-group v-model="item.attr_vals">
+                                <el-checkbox :label="item" v-for="item in item.attr_vals" border></el-checkbox>
+                            </el-checkbox-group>
+                        </el-form-item>
+                    </el-tab-pane>
+                    <el-tab-pane label="商品属性" name="2">
+                        <el-form-item :label="item.attr_name" v-for="item in onlyTableData" :key="item.attr_id">
+                            <el-input v-model="item.attr_vals"></el-input>
+                        </el-form-item>
+                    </el-tab-pane>
+                    <el-tab-pane label="商品图片" name="3">
+                        <el-upload class="upload-demo" :action="uploadURL" :on-preview="handlePreview"
+                            :on-remove="handleRemove" :on-success="hanldeSuccess" list-type="picture"
+                            :headers="headerObj">
+                            <el-button size="small" type="primary">点击上传</el-button>
+                        </el-upload>
+                    </el-tab-pane>
                     <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
                 </el-tabs>
             </el-form>
         </el-card>
+        <el-dialog title="图片预览" :visible.sync="previewVisible" width="50%">
+            <img :src="previewPath" alt="" class="previewImg">
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -105,6 +124,12 @@
                 onlyTableData: [],
                 // 上传图片的URL地址
                 uploadURL: 'http://127.0.0.1:8888/api/private/v1/upload',
+                headerObj: {
+                    Authorization: window.sessionStorage.getItem('token')
+                },
+                previewVisible: false,
+                previewPath: ''
+
             }
         },
         created() {
@@ -172,6 +197,33 @@
                     })
                 }
             },
+            // 处理移除图片的操作
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+                const filepath = file.response.data.tmp_path
+                      // 2. 从 pics 数组中，找到这个图片对应的索引值
+                const i = this.addgoodsForm.pics.findIndex(item =>
+                    item.pic === filepath
+                )
+                      // 3. 调用数组的 splice 方法，把图片信息对象，从 pics 数组中移除
+                this.addgoodsForm.pics.splice(i,1)
+                
+            },
+            // 处理图片预览效果
+            handlePreview(file) {
+                console.log(file);
+                this.previewPath = file.response.data.url
+                this.previewVisible = true;
+            },
+            // 图片上传成功
+            hanldeSuccess(response, file, fileList) {
+                // console.log(response);
+                const picinfo = {
+                    pic: response.data.tmp_path
+                }
+                this.addgoodsForm.pics.push(picinfo)
+                console.log(this.addgoodsForm.pics);
+            }
         },
         computed: {
             cateId() {
@@ -201,5 +253,14 @@
     .el-tabs {
         max-height: 420px;
         overflow-y: auto !important;
+    }
+
+    .el-checkbox {
+        margin: 0 !important;
+        margin-right: 10px !important;
+    }
+
+    .previewImg {
+        width: 100%;
     }
 </style>
