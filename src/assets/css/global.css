@@ -19,3 +19,6 @@ html,body,#app {
     overflow-y: scroll !important;
     max-height: 450px;
 }
+.ql-editor {
+    min-height: 200px;
+}

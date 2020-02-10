@@ -16,7 +16,7 @@
                 <el-step title="商品内容"></el-step>
                 <el-step title="完成"></el-step>
             </el-steps>
-            <el-form :model="addgoodsForm" :rules="addgoodsrules" ref="ruleForm" label-width="100px"
+            <el-form :model="addgoodsForm" :rules="addgoodsrules" ref="addruleForm" label-width="100px"
                 label-position="top">
                 <el-tabs v-model="activeIndex" :tab-position="tabPosition" :before-leave="beforeTabLeave"
                     @tab-click="tabClicked">
@@ -58,7 +58,12 @@
                             <el-button size="small" type="primary">点击上传</el-button>
                         </el-upload>
                     </el-tab-pane>
-                    <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
+                    <el-tab-pane label="商品内容" name="4">
+                        <!-- 富文本区域 -->
+                        <quill-editor></quill-editor>
+                        <!-- 添加商品的按钮 -->
+                        <el-button type="primary" class="btnAdd" @click="add">添加商品</el-button>
+                    </el-tab-pane>
                 </el-tabs>
             </el-form>
         </el-card>
@@ -68,6 +73,7 @@
     </div>
 </template>
 <script>
+    import _ from 'lodash'
     export default {
         data() {
             return {
@@ -76,9 +82,9 @@
                 cateList: [],
                 addgoodsForm: {
                     goods_name: '',
-                    goods_price: '',
-                    goods_weight: '',
-                    goods_number: '',
+                    goods_price: 999,
+                    goods_weight: 111,
+                    goods_number: 99,
                     goods_cat: [],
                     // 图片的数组
                     pics: [],
@@ -201,13 +207,13 @@
             handleRemove(file, fileList) {
                 console.log(file, fileList);
                 const filepath = file.response.data.tmp_path
-                      // 2. 从 pics 数组中，找到这个图片对应的索引值
+                // 2. 从 pics 数组中，找到这个图片对应的索引值
                 const i = this.addgoodsForm.pics.findIndex(item =>
                     item.pic === filepath
                 )
-                      // 3. 调用数组的 splice 方法，把图片信息对象，从 pics 数组中移除
-                this.addgoodsForm.pics.splice(i,1)
-                
+                // 3. 调用数组的 splice 方法，把图片信息对象，从 pics 数组中移除
+                this.addgoodsForm.pics.splice(i, 1)
+
             },
             // 处理图片预览效果
             handlePreview(file) {
@@ -223,6 +229,46 @@
                 }
                 this.addgoodsForm.pics.push(picinfo)
                 console.log(this.addgoodsForm.pics);
+            },
+            // 添加商品
+            add() {
+                this.$refs.addruleForm.validate(valid => {
+                    if (!valid) {
+                        return this.$message.error('请完整填写商品信息')
+                    }
+                    // 执行添加的业务逻辑
+                    // lodash   cloneDeep(obj)
+                    const form = _.cloneDeep(this.addgoodsForm)
+                    form.goods_cat = form.goods_cat.join(',')
+                    // const form = this.addgoodsForm
+                    // form.goods_cat = form.goods_cat.join(',')
+                    // 处理动态参数
+                    this.manyTableData.forEach(item => {
+                        const newInfo = {
+                            attr_id: item.attr_id,
+                            attr_value: item.attr_vals.join(' ')
+                        }
+                        this.addgoodsForm.attrs.push(newInfo)
+                    })
+                    // 处理静态属性
+                    this.onlyTableData.forEach(item => {
+                        const newInfo = {
+                            attr_id: item.attr_id,
+                            attr_value: item.attr_vals
+                        }
+                        this.addgoodsForm.attrs.push(newInfo)
+                    })
+                    form.attrs=this.addgoodsForm.attrs
+                    console.log(form);
+                    console.log(this.manyTableData);
+                    this.$http.post('goods',form).then(res=>{
+                        if(res.data.meta.status!==201){
+                            return this.$message.error('添加商品失败')
+                        }
+                        this.$message.success('添加商品成功！')
+                        this.$router.push('/goods')
+                    })
+                })
             }
         },
         computed: {
@@ -262,5 +308,9 @@
 
     .previewImg {
         width: 100%;
+    }
+
+    .btnAdd {
+        margin-top: 15px !important;
     }
 </style>
