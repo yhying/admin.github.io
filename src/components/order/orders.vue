@@ -125,7 +125,7 @@
               return this.$message.error('获取订单列表失败！')
             }
       
-            console.log(res)
+            // console.log(res)
             this.total = res.data.total
             this.orderlist = res.data.goods
           },
@@ -154,7 +154,7 @@
             this.progressInfo = res.data
       
             this.progressVisible = true
-            console.log(this.progressInfo)
+            // console.log(this.progressInfo)
           }
         }
       }

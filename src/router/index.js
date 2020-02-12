@@ -1,17 +1,24 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../components/Login.vue'
-import Home from '../components/home.vue'
-import Welcome from '../components/Welcome.vue'
-import users from '../components/user/users.vue'
-import roles from '../components/power/roles.vue'
-import rights from '../components/power/rights.vue'
-import goods from '../components/good/goods.vue'
-import params from '../components/good/params.vue'
-import categories from '../components/good/categories.vue'
-import orders from '../components/order/orders.vue'
-import reports from '../components/report/reports.vue'
-import add from '../components/good/add.vue'
+
+const Login = () => import(/* webpackChunkName: "login_home_welcome" */ '../components/Login.vue')
+const Home = () => import(/* webpackChunkName: "login_home_welcome" */ '../components/home.vue')
+const Welcome = () => import(/* webpackChunkName: "login_home_welcome" */ '../components/Welcome.vue')
+// import users from '../components/user/users.vue'
+// import roles from '../components/power/roles.vue'
+// import rights from '../components/power/rights.vue'
+const users = () => import(/* webpackChunkName: "Users_Rights_Roles" */ '../components/user/users.vue')
+const roles = () => import(/* webpackChunkName: "Users_Rights_Roles" */ '../components/power/roles.vue')
+const rights = () => import(/* webpackChunkName: "Users_Rights_Roles" */ '../components/power/rights.vue')
+
+const categories = () => import(/* webpackChunkName: "Cate_Params" */ '../components/good/categories.vue')
+const params = () => import(/* webpackChunkName: "Cate_Params" */ '../components/good/params.vue')
+
+const goods = () => import(/* webpackChunkName: "GoodsList_Add" */ '../components/good/goods.vue')
+const add = () => import(/* webpackChunkName: "GoodsList_Add" */ '../components/good/add.vue')
+
+const orders = () => import(/* webpackChunkName: "Order_Report" */ '../components/order/orders.vue')
+const reports = () => import(/* webpackChunkName: "Order_Report" */ '../components/report/reports.vue')
 
 Vue.use(VueRouter)
 
