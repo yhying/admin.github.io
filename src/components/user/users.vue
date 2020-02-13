@@ -415,4 +415,8 @@
     }
 </script>
 <style lang="less" scoped>
+    .el-table {
+        max-height: 450px;
+        overflow-y: auto;
+    }
 </style>

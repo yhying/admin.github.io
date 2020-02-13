@@ -50,4 +50,8 @@
     }
 </script>
 <style lang="less" scoped>
+    /* .el-table {
+        max-height: 500px;
+        height: 500px;
+    } */
 </style>
